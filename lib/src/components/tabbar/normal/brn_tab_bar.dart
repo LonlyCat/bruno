@@ -272,6 +272,7 @@ class BrnTabBarState extends State<BrnTabBar> {
         tabs: fillWidgetByDataList(_isScrollable),
         controller: widget.controller,
         isScrollable: _isScrollable,
+        dividerColor: Colors.transparent,
         labelColor: widget.labelColor ?? widget.themeData!.labelStyle.color,
         labelStyle: widget.labelStyle ??
             widget.themeData!.labelStyle.generateTextStyle(),
