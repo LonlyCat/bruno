@@ -31,6 +31,7 @@ class BrnBottomTabBar extends StatefulWidget {
     Key? key,
     required this.items,
     this.onTap,
+    this.onDoubleTap,
     this.currentIndex = 0,
     this.type = BrnBottomTabBarDisplayType.fixed,
     this.fixedColor,
@@ -60,6 +61,9 @@ class BrnBottomTabBar extends StatefulWidget {
 
   /// Tab点击之后的回调函数
   final ValueChanged<int>? onTap;
+
+  /// Tab双击之后的回调函数
+  final ValueChanged<int>? onDoubleTap;
 
   /// 当前活动项的索引值
   final int currentIndex;
@@ -235,6 +239,9 @@ class _BottomTabBarState extends State<BrnBottomTabBar> with TickerProviderState
               onTap: () {
                 if (widget.onTap != null) widget.onTap!(i);
               },
+              onDoubleTap: () {
+                if (widget.onDoubleTap != null) widget.onDoubleTap!(i);
+              },
               colorTween: colorTween,
               selected: i == widget.currentIndex,
               indexLabel: localizations.tabLabel(
@@ -258,6 +265,9 @@ class _BottomTabBarState extends State<BrnBottomTabBar> with TickerProviderState
               widget.iconSize,
               onTap: () {
                 if (widget.onTap != null) widget.onTap!(i);
+              },
+              onDoubleTap: () {
+                if (widget.onDoubleTap != null) widget.onDoubleTap!(i);
               },
               flex: _evaluateFlex(_animations[i]),
               selected: i == widget.currentIndex,
@@ -362,6 +372,7 @@ class _BottomNavigationTile extends StatelessWidget {
       this.animation,
       this.iconSize, {
         this.onTap,
+        this.onDoubleTap,
         this.colorTween,
         this.flex,
         this.selected = false,
@@ -376,6 +387,7 @@ class _BottomNavigationTile extends StatelessWidget {
   final Animation<double> animation;
   final double iconSize;
   final VoidCallback? onTap;
+  final VoidCallback? onDoubleTap;
   final ColorTween? colorTween;
   final double? flex;
   final bool selected;
@@ -564,6 +576,7 @@ class _BottomNavigationTile extends StatelessWidget {
     if (isInkResponse) {
       return InkResponse(
         onTap: onTap,
+        onDoubleTap: onDoubleTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -577,6 +590,7 @@ class _BottomNavigationTile extends StatelessWidget {
     }
     return GestureDetector(
         onTap: onTap,
+        onDoubleTap: onDoubleTap,
         behavior: HitTestBehavior.opaque,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

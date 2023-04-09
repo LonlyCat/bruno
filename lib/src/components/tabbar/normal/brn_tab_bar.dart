@@ -40,6 +40,9 @@ class BrnTabBar extends StatefulWidget {
   /// TabBar背景颜色
   final Color backgroundcolor;
 
+  /// 是否隐藏指示器
+  final bool hiddenIndicator;
+
   /// 指示器的颜色
   final Color? indicatorColor;
 
@@ -102,6 +105,9 @@ class BrnTabBar extends StatefulWidget {
   /// tag高度
   final double? tagHeight;
 
+  /// 选择的缩放比例
+  final double? selectScale;
+
   BrnTabBarConfig? themeData;
 
   BrnTabBar({
@@ -112,6 +118,7 @@ class BrnTabBar extends StatefulWidget {
     this.padding = EdgeInsets.zero,
     this.controller,
     this.backgroundcolor = const Color(0xffffffff),
+    this.hiddenIndicator = false,
     this.indicatorColor,
     this.indicatorWeight,
     this.indicatorWidth,
@@ -124,6 +131,7 @@ class BrnTabBar extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
     this.onTap,
     this.tabWidth,
+    this.selectScale,
     this.hasDivider = false,
     this.hasIndex = false,
     this.showMore = false,
@@ -282,7 +290,9 @@ class BrnTabBarState extends State<BrnTabBar> {
             _brnTabbarController.entry = null;
           }
         },
-        indicator: CustomWidthUnderlineTabIndicator(
+        indicator: widget.hiddenIndicator
+            ? BoxDecoration()
+            : CustomWidthUnderlineTabIndicator(
           insets: widget.indicatorPadding,
           borderSide: BorderSide(
             width: widget.themeData!.indicatorHeight,
@@ -372,7 +382,53 @@ class BrnTabBarState extends State<BrnTabBar> {
         }
       }
     }
-    return widgets;
+    double? scale = widget.selectScale;
+    var _tabController = widget.controller!;
+    return widgets.asMap().entries.map(
+          (entry) {
+        if (scale == null) {
+          return entry.value;
+        }
+        return AnimatedBuilder(
+          animation: _tabController.animation!,
+          builder: (ctx, snapshot) {
+            final forward = _tabController.offset > 0;
+            final backward = _tabController.offset < 0;
+            int _fromIndex;
+            int _toIndex;
+            double progress;
+            // Tab
+            if (_tabController.indexIsChanging) {
+              _fromIndex = _tabController.previousIndex;
+              _toIndex = _tabController.index;
+              progress = (_tabController.animation!.value - _fromIndex).abs() /
+                  (_toIndex - _fromIndex).abs();
+            } else {
+              // Scroll
+              _fromIndex = _tabController.index;
+              _toIndex = forward
+                  ? _fromIndex + 1
+                  : backward
+                  ? _fromIndex - 1
+                  : _fromIndex;
+              progress = (_tabController.animation!.value - _fromIndex).abs();
+            }
+            var flag = entry.key == _fromIndex
+                ? 1 - progress
+                : entry.key == _toIndex
+                ? progress
+                : 0.0;
+            return AnimatedScale(
+              scale: 1 + flag * 0.4,
+              duration: const Duration(milliseconds: 50),
+              alignment:
+              entry.key == 0 ? Alignment(-1.0, 0.4) : Alignment(0, 0.4),
+              child: entry.value,
+            );
+          },
+        );
+      },
+    ).toList();
   }
 
   // 原始的自适应的tab样式
