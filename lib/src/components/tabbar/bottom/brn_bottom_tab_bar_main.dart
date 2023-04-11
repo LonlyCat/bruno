@@ -421,15 +421,19 @@ class _BottomNavigationTile extends StatelessWidget {
         container: true,
         header: true,
         selected: selected,
-        child: Stack(
-          children: <Widget>[
-            Positioned(right: 4, top: 4, child: _buildBadge()!),
-            _buildInkWidget(label),
-            Semantics(
-              label: indexLabel,
-            )
-          ],
-        ),
+        child: LayoutBuilder(builder: (context, constrains) {
+          double verticalMargin = (kBottomNavigationBarHeight - iconSize)/2 - 6;
+          double horizontalMargin = (constrains.maxWidth - iconSize)/2 - 6;
+          return Stack(
+            children: [
+              _buildInkWidget(label),
+              Positioned(right: horizontalMargin, top: verticalMargin, child: _buildBadge()!),
+              Semantics(
+                label: indexLabel,
+              )
+            ],
+          );
+        }),
       ),
     );
   }
